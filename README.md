@@ -99,6 +99,8 @@ Note: The **=** sign is important here. Replacing the equal sign with a space wi
 
 * **no_tls_domains**: A list of Domains for which TLS should NOT be used if the XMPP server supports STARTTLS but does NOT require it **(default: [ ])**
 
+* **no_srv**: Set to 'true' to disable the `_xmpp-client._tcp` SRV lookup and just resolve the hostname instead. **(default: false)**
+
 * **firewall**: An object (map) of type { allow: [ list... ], deny: [ list... ] }, where [ list... ] means an array of strings or regular expressions which are tested against the domain connected to. ONLY One of the 2 (deny or allow) shall be used depending on which array has values. The one that is non-empty shall be used. If both are empty (default), all connections are allowed. If both are non-empty, then the ALLOW list is used and ONLY connections to the domains listed in ALLOW are connected to **(default: { allow: [ ], deny: [ ] })**
 
 * **route_filter**: If the route attribute is set, allow connections ONLY if the route attribute matches the regex below **(default: /.\*/)**
@@ -110,6 +112,8 @@ Note: The **=** sign is important here. Replacing the equal sign with a space wi
 * **system_info_password**: The password used to protect the /PATH/sysinfo/ URL. The username to use when prompted for authentication is 'admin' **(default: [not set])**
 
 * **websocket_ping_interval**: The period, in seconds, between sending WebSocket ping frames to each client. If a client fails to respond with a pong frame twice in a row, the connection will be closed. Set to 0 to disable sending of WebSocket pings. **(default: 30)**
+
+* **use_stream_tags**: Set to 'true' to enable the use of legacy `<stream>` tags instead of `<open>` and `<close>`. You may need this if your client is not up to date with the spec. **(default: false)**
 
 ### Architecture
 
@@ -238,7 +242,7 @@ if the *callback=* GET query parameter is supplied.
 
 * [http://xmpp.org/extensions/xep-0124.html](http://xmpp.org/extensions/xep-0124.html)
 * [http://xmpp.org/extensions/xep-0206.html](http://xmpp.org/extensions/xep-0206.html)
-* [http://tools.ietf.org/html/draft-moffitt-xmpp-over-websocket-00](http://tools.ietf.org/html/draft-moffitt-xmpp-over-websocket-00)
+* [https://tools.ietf.org/html/draft-ietf-xmpp-websocket-10](https://tools.ietf.org/html/draft-ietf-xmpp-websocket-10)
 
 
 ### Dependencies
@@ -278,6 +282,7 @@ if the *callback=* GET query parameter is supplied.
     4. libpurple (pidgin as a client)
     5. [strophe.js websocket client] (https://github.com/superfeedr/strophejs/tree/protocol-ed) [broken link]
     6. [node-xmpp] (https://github.com/astro/node-xmpp)
+    7. [stanza.io] (https://github.com/otalk/stanza.io)
 
 
 ### Tested using
