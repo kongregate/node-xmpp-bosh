@@ -170,6 +170,10 @@ function main() {
 		server_options.no_srv = true;
 	}
 
+	if(typeof(server_options.permessage_deflate) === 'undefined') {
+		server_options.permessage_deflate = true;
+	}
+
     // Set the default line trim length.
     if (typeof(server_options.trim_default_length) !== 'undefined') {
         dutil.TRIM_DEFAULT_LENGTH = server_options.trim_default_length;
