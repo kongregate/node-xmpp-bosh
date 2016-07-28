@@ -114,7 +114,11 @@ dutil.copy(XMPPLookupService.prototype, {
             give_up_trying_to_connect
         ];
 
-        function _connect_next() {
+        function _connect_next(e) {
+            if(e) {
+                log.info('connection error: %s', e);
+            }
+
             var connector = connectors.shift();
             assert(connector && typeof(connector) === 'function');
             connector(_on_socket_connected, _connect_next);
