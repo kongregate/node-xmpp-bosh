@@ -2,17 +2,17 @@
 
 /*
  * Copyright (c) 2011 Dhruv Matani
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -47,8 +47,8 @@ function XMPPProxyConnector(bosh_server, options) {
 
 	// {
 	//   stream_name: {
-	//     stream: stream, 
-	//     proxy: The XMPP proxy object for this stream, 
+	//     stream: stream,
+	//     proxy: The XMPP proxy object for this stream,
 	//     pending: [ An array of pending outgoing stanzas ]
 	//   }
 	// }
@@ -131,7 +131,7 @@ function XMPPProxyConnector(bosh_server, options) {
 XMPPProxyConnector.prototype = {
 
 	stanza: function(stanza, stream) {
-		log.trace("%s %s bosh-stanza: %s", stream.session.sid, stream.name, 
+		log.trace("%s %s bosh-stanza: %s", stream.session.sid, stream.name,
                   dutil.replace_promise(dutil.trim_promise(stanza), '\n', ' '));
 		var ss = this.streams[stream.name];
 		if (!ss) {
@@ -153,7 +153,7 @@ XMPPProxyConnector.prototype = {
 			ss.pending.push(stanza);
 		}
 
-	}, 
+	},
 
 	stream_add: function(stream) {
 		log.trace("%s %s stream_add", stream.session.sid, stream.name);
@@ -163,15 +163,15 @@ XMPPProxyConnector.prototype = {
 		}
 
 		var _ls_ctor = this.options.lookup_service || lookup.LookupService;
-		var _ls      = new _ls_ctor(DEFAULT_XMPP_PORT, stream, this.options.route_filter, this.options.no_srv);
+		var _ls      = new _ls_ctor(DEFAULT_XMPP_PORT, stream, this.options.route_filter, this.options);
 
 		// Create a new stream.
-		var proxy = new this.Proxy(stream.to, _ls, stream.attrs, 
+		var proxy = new this.Proxy(stream.to, _ls, stream.attrs,
 								   this.options, stream);
 
 		var stream_object = {
-			stream: stream, 
-			proxy: proxy, 
+			stream: stream,
+			proxy: proxy,
 			pending: [ ]
 		};
 		this.streams[stream.name] = stream_object;
@@ -182,7 +182,7 @@ XMPPProxyConnector.prototype = {
 		proxy.on('close',   this._on_xmpp_proxy_close);
 
 		proxy.connect();
-	}, 
+	},
 
 	stream_restart: function(stream) {
 		// To restart a stream, we just call restart on the XMPPProxy object.
@@ -193,7 +193,7 @@ XMPPProxyConnector.prototype = {
 
 		log.trace("%s %s stream_restart", stream.session.sid, stream.name);
 		ss.proxy.restart(stream.attrs);
-	}, 
+	},
 
 	stream_terminate: function(stream) {
 		// To terminate a stream, we just call terminate on the XMPPProxy object.

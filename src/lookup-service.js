@@ -55,12 +55,13 @@ var log         = require('./log.js').getLogger(filename);
  *         the following fields: 'route'
  *
  */
-function XMPPLookupService(port, stream, route_filter, no_srv) {
+function XMPPLookupService(port, stream, route_filter, options) {
     this._domain_name = stream.to;
     this._port = port;
     this._route = stream.route;
     this._allow_connect = true;
-    this._no_srv = !!no_srv;
+    this._no_srv = !!options.no_srv;
+    this._timeout = options.connection_timeout;
 
     var _special = {
         "gmail.com": "talk.google.com",
@@ -116,7 +117,7 @@ dutil.copy(XMPPLookupService.prototype, {
 
         function _connect_next(e) {
             if(e) {
-                log.info('connection error: %s', e);
+                log.info('Connection error: %s', e);
             }
 
             var connector = connectors.shift();
@@ -128,7 +129,7 @@ dutil.copy(XMPPLookupService.prototype, {
             // First just connect to the server if this._route is defined.
             if (self._route) {
                 log.trace('try_connect_route - %s:%s', self._route.host, self._route.port);
-                var emitter = SRV.connect(socket, [ ], self._route.host, self._route.port);
+                var emitter = SRV.connect(socket, [ ], self._route.host, self._route.port, self._timeout);
 
                 emitter.once('connect', on_success);
                 emitter.once('error',   on_error);
@@ -144,14 +145,14 @@ dutil.copy(XMPPLookupService.prototype, {
 
             // Then try a normal SRV lookup.
             var emitter = SRV.connect(socket, self._no_srv ? [ ] : ['_xmpp-client._tcp'],
-                                      self._domain_name, self._port);
+                                      self._domain_name, self._port, self._timeout);
 
             emitter.once('connect', on_success);
             emitter.once('error',   on_error);
         }
 
         function give_up_trying_to_connect() {
-            log.warn('Giving up connection attempts to %s', self._domain_name);
+            log.warn('Giving up connection attempts to %s, timeout=%s', self._domain_name, self._timeout);
             // Trigger the error event.
             self.emit('error', 'host-unknown');
         }
