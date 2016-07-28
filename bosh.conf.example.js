@@ -106,4 +106,7 @@ exports.config = {
 
 	// Set to true to use legacy <stream> tags instead of <open> and <close>
 	use_stream_tags: false,
+
+	// Enable/disable compression or tune settings by setting to an object
+	permessage_deflate: true
 };
