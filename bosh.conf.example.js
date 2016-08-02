@@ -110,6 +110,10 @@ exports.config = {
 	// Enable/disable compression or tune settings by setting to an object
 	permessage_deflate: true,
 
+	// Enable the use of the faster LTX XML parser. This is a tradeoff between
+	// speed and error handling
+	use_ltx_parser: false,
+
 	// Connection timeout to remote host
 	connection_timeout: 10000
 };

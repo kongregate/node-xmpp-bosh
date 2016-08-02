@@ -184,6 +184,10 @@ function main() {
 		server_options.connection_timeout = 10000;
 	}
 
+	if(typeof(server_options.use_ltx_parser) === 'undefined') {
+		server_options.use_ltx_parser = false;
+	}
+
   // Set the default line trim length.
   if (typeof(server_options.trim_default_length) !== 'undefined') {
       dutil.TRIM_DEFAULT_LENGTH = server_options.trim_default_length;
