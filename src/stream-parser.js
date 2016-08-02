@@ -30,12 +30,14 @@ var util   = require('util');
 var events = require('events');
 var dutil  = require('./dutil.js');
 var expat  = require('node-expat');
+var ltxParser = require('ltx/lib/parsers/ltx');
 
 function XmppStreamParser() {
     events.EventEmitter.apply(this);
 
     this.__defineGetter__("getCurrentByteIndex", function () {
-        return this._parser ? this._parser.getCurrentByteIndex() : 0;
+        return 0;
+        //return this._parser ? this._parser.getCurrentByteIndex() : 0;
     });
 
     this._start();
@@ -102,17 +104,18 @@ dutil.copy(XmppStreamParser.prototype, {
     },
 
     parse: function(data) {
-        if (this._parser && !this._parser.parse(data)) {
+        /*if (this._parser && !this._parser.parse(data)) {
             // in case the parser is deleted on end-stream
             // and there is garbage after that.
             if (this._parser) {
                 this.emit("error", this._parser.getError());
             }
-        }
+        }*/
+        this._parser && this._parser.write(data);
     },
 
     _start: function () {
-        this._parser = new expat.Parser('UTF-8');
+        this._parser = new ltxParser();
         this._started = this._started || false;
 
         this._parser.on("text", this._handle_text.bind(this));
@@ -123,7 +126,7 @@ dutil.copy(XmppStreamParser.prototype, {
 
     end: function() {
         if (this._parser) {
-            this._parser.stop();
+            this._parser.end();
             this._parser.removeAllListeners();
             delete this._parser;
         }

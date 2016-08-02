@@ -13,7 +13,7 @@
     "ejs": "~0.8.3",
     "eventpipe": "~0.0.5",
     "heapdump": "^0.3.7",
-    "ltx": "~0.5.1",
+    "ltx": "~2.4.2",
     "memwatch-next": "^0.3.0",
     "node-expat": "~2.3.0",
     "node-lumberjack": "= 0.0.4",
