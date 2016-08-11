@@ -59,6 +59,9 @@ function BOSH_Options(opts) {
         'Access-Control-Max-Age': '14400'
     };
 
+    this.ACCESS_CONTROL_ALLOW_ORIGINS = _opts.access_control_allow_origins;
+    log.debug("ACCESS_CONTROL_ALLOW_ORIGINS: %s", this.ACCESS_CONTROL_ALLOW_ORIGINS);
+
     if (_opts.http_headers) {
         helper.add_to_headers(this.HTTP_GET_RESPONSE_HEADERS, _opts.http_headers);
         helper.add_to_headers(this.HTTP_POST_RESPONSE_HEADERS, _opts.http_headers);

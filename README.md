@@ -97,6 +97,8 @@ Note: The **=** sign is important here. Replacing the equal sign with a space wi
 
 * **http_headers**: A JSON (object) containing HTTP headers to pass on along with the response **(default: { })**
 
+* **access_control_allow_origins**: Set to a regular expression to be tested against the `Origin` header to allow setting the `Access-Control-Allow-Origin` header to that origin. This is useful for using `Access-Control-Allow-Credentials` with multiple hosts. **(default: null)**
+
 * **no_tls_domains**: A list of Domains for which TLS should NOT be used if the XMPP server supports STARTTLS but does NOT require it **(default: [ ])**
 
 * **no_srv**: Set to 'true' to disable the `_xmpp-client._tcp` SRV lookup and just resolve the hostname instead. **(default: false)**

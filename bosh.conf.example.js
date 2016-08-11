@@ -38,6 +38,12 @@ exports.config = {
 
 	http_headers: { },
 
+	// Set to a regular expression to be tested against the 'Origin' header
+	// to allow setting the 'Access-Control-Allow-Origin' header to that origin.
+	// This is useful for using 'Access-Control-Allow-Credentials' with
+	// multiple hosts.
+	access_control_allow_origins: null,
+
 	//
 	// A list of Domains for which TLS should NOT be used
 	// if the XMPP server supports STARTTLS but does NOT

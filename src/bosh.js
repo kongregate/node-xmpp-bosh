@@ -230,7 +230,7 @@ exports.createServer = function (options) {
     //Called when the 'end' event for the request is fired by the HTTP request handler
     function bosh_request_handler(res, node) {
         if (!node) {
-            res.writeHead(200, bosh_options.HTTP_POST_RESPONSE_HEADERS);
+            res.writeHead(200);
             res.end(helper.$terminate({ condition: 'bad-request' }).toString());
             return;
         }

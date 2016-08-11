@@ -44,6 +44,7 @@ function HTTPServer(port, host, stat_func, system_info_func,
 
     var bosh_request_parser = new BoshRequestParser();
     var req_list1 = [ ], req_list2 = [ ];
+    var origin_regex = bosh_options.ACCESS_CONTROL_ALLOW_ORIGINS;
 
     function parse_request(buffers) {
         var valid_request = true;
@@ -132,6 +133,7 @@ function HTTPServer(port, host, stat_func, system_info_func,
                 log.warn("%s - destroying connection from '%s'", err, req.socket.remoteAddress);
                 req.destroy();
             } else {
+                add_cors_headers(req, res);
                 var body = parse_request(req_parts);
                 if (body) {
                     log.debug("RECD: %s", dutil.replace_promise(dutil.trim_promise(body), '\n', ' '));
@@ -300,6 +302,22 @@ function HTTPServer(port, host, stat_func, system_info_func,
         }
         req_list2 = req_list1;
         req_list1 = [ ];
+    }
+
+    function add_cors_headers(req, res) {
+        var headers = bosh_options.HTTP_POST_RESPONSE_HEADERS;
+        for(var key in headers) {
+            if(headers.hasOwnProperty(key)) {
+                res.setHeader(key, headers[key]);
+            }
+        }
+
+        if(origin_regex) {
+            var origin = (req.headers ? req.headers.origin : null) || '';
+            if(origin_regex.test(origin)) {
+                res.setHeader('Access-Control-Allow-Origin', origin);
+            }
+        }
     }
 
     var router = new EventPipe();
