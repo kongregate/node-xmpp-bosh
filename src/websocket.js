@@ -164,13 +164,15 @@ exports.createServer = function(bosh_server, options, webSocket) {
         wsep.emit('response', XML_STREAM_CLOSE, sstate);
         sstate.terminated = true;
     });
-    
+
     websocket_server.on('connection', function(conn) {
         // Listen for websocket client errors to prevent crashes
-        conn.on('error', emit_error);
+        conn.on('error', function(e) {
+            log.error('connection error: %s, %s', e.toString(), e.stack);
+        });
 
         var stream_name = uuid();
-        
+
         // Note: xmpp-proxy.js relies on the session object
         // to have a sid attribute and the stream object to
         // contain a name attribute. This is done to improve
