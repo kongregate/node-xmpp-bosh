@@ -39,6 +39,7 @@ var filename    = path.basename(path.normalize(__filename));
 var log         = require('./log.js').getLogger(filename);
 
 var xmlTextDeclRE = /<\?xml [^\?]+\?>/;
+var pf = require('policyfile');
 
 var STREAM_UNOPENED = 1;
 var STREAM_OPENED   = 2;
@@ -58,6 +59,12 @@ var XML_CLOSE_TAG = '<close xmlns="urn:ietf:params:xml:ns:xmpp-framing" />';
 //
 
 exports.createServer = function(bosh_server, options, webSocket) {
+    var policyPort = options.port + 1;
+    var policyServer = pf.createServer();
+    policyServer.listen(policyPort, function(){
+      log.debug('Policy file server created on port %s', policyPort);
+    });
+
     webSocket = webSocket || require('uws');
 
 	// Config options
