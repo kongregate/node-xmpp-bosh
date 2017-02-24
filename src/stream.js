@@ -156,7 +156,8 @@ function StreamStore(bosh_options, bep) {
 StreamStore.prototype = {
 
     get_active_no: function () {
-        return Object.keys(this._sn_state).length;
+        var count = 0; for (var k in this._sn_state) ++count;
+        return count;
     },
 
     get_total_no: function () {

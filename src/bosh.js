@@ -175,10 +175,10 @@ exports.createServer = function (options) {
                 return;
             }
 
-            log.trace("%s %s req.rid: %s, session.rid: %s", session.sid, 
-                          node.attrs.stream || "NO_Stream", node.attrs.rid, 
+            log.trace("%s %s req.rid: %s, session.rid: %s", session.sid,
+                          node.attrs.stream || "NO_Stream", node.attrs.rid,
                           session.rid);
-            
+
             // are comments like this good?
             // I was also thinking if logging(log statements) can
             // replace comments all together??
@@ -254,7 +254,7 @@ exports.createServer = function (options) {
     // When a response is received from the connector, try to send it out to the
     // real client if possible.
     function _on_response(stanza, stream) {
-        log.trace("%s %s response: %s", stream.state.sid, stream.name, 
+        log.trace("%s %s response: %s", stream.state.sid, stream.name,
                   dutil.replace_promise(dutil.trim_promise(stanza), '\n', ' '));
         var session = stream.session;
 
@@ -262,7 +262,7 @@ exports.createServer = function (options) {
 
         // Send a stream termination tag in the <body> element
         // if the stanza is a <stream:error> stanza.
-        // 
+        //
         // https://github.com/dhruvbird/node-xmpp-bosh/issues/21
         if (stanza.is('error')) {
             stream.send_stream_terminate_response('remote-stream-error');
@@ -302,6 +302,10 @@ exports.createServer = function (options) {
 
     session_store = new sess.SessionStore(bosh_options, bep);
     stream_store  = new strm.StreamStore(bosh_options, bep);
+
+    setInterval(function() {
+        log.info("BOSH session count: " + session_store.get_active_no());
+    }, 10000);
 
     bep.set_session_data(session_store);
     bep.set_stream_data(stream_store);

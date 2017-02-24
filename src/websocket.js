@@ -66,20 +66,23 @@ exports.createServer = function(bosh_server, options, webSocket) {
     });
 
     webSocket = webSocket || require('uws');
-
 	// Config options
 	var ping_interval = options.websocket_ping_interval;
     var use_stream_tags = !!options.use_stream_tags;
 
     // State information for XMPP streams
     var sn_state = { };
-    
+    setInterval(function() {
+        var count = 0; for (var k in sn_state) ++count;
+        log.info("WebSocket session count: " + count);
+    }, 10000);
+
     function WebSocketEventPipe(bosh_server) {
         this.bosh_server = bosh_server;
     }
-    
+
     util.inherits(WebSocketEventPipe, EventPipe);
-    
+
     dutil.copy(WebSocketEventPipe.prototype, {
         stop: function() {
             return websocket_server.close();
@@ -91,9 +94,9 @@ exports.createServer = function(bosh_server, options, webSocket) {
             return this.bosh_server.stat_stream_terminate();
         }
     });
-    
+
     var wsep = new WebSocketEventPipe(bosh_server);
-    
+
     var websocket_server = new webSocket.Server({
         server:  bosh_server.server,
         perMessageDeflate: options.permessage_deflate,
@@ -109,9 +112,9 @@ exports.createServer = function(bosh_server, options, webSocket) {
         },
         // autoAcceptConnections: true,
     });
-    
+
     wsep.server = websocket_server;
-    
+
     wsep.on('stream-added', function(sstate) {
         var to = sstate.to || '';
         var tagName = use_stream_tags ? 'stream:stream' : 'open';
@@ -187,7 +190,7 @@ exports.createServer = function(bosh_server, options, webSocket) {
         // coupling. We may choose to get rid of it later.
         // Deviation from this behaviour for now might lead to
         // a crash or unreadable logs.
-        
+
         var sstate = {
             name: stream_name,
             stream_state: STREAM_UNOPENED,
@@ -237,7 +240,7 @@ exports.createServer = function(bosh_server, options, webSocket) {
                 log.warn("Only utf-8 supported...");
                 return;
             }
-            
+
             // Check if this is a stream open message
             if (message.indexOf('<stream:stream') !== -1) {
                 // Yes, it is.
@@ -281,12 +284,12 @@ exports.createServer = function(bosh_server, options, webSocket) {
                 }
                 return;
             }
-            
+
             // TODO: Maybe use a SAX based parser instead
             message = '<dummy>' + message + '</dummy>';
-            
+
             log.debug("%s - Processing: %s", stream_name, message);
-            
+
             // XML parse the message
             var nodes = dutil.xml_parse(message);
             if (!nodes) {
@@ -295,29 +298,29 @@ exports.createServer = function(bosh_server, options, webSocket) {
                 sstate.conn.close();
                 return;
             }
-            
+
             // console.log("xml nodes:", nodes);
             nodes = nodes.children;
-            
+
             // The stream start node is special since we trigger a
             // stream-add event when we get it.
             var ss_node = nodes.filter(function(node) {
                 return typeof node.is === 'function' && (node.is('stream') || node.is('open'));
             });
-            
+
             ss_node = us.first(ss_node);
-            
+
             nodes = nodes.filter(function(node) {
                 return typeof node.is === 'function' ? !(node.is('stream') || node.is('open')) : true;
             });
-            
+
             if (ss_node) {
                 if (sstate.stream_state === STREAM_UNOPENED) {
                     // Start a new stream
                     wsep.stat_stream_add();
                     sstate.stream_state = STREAM_OPENED;
                     // console.log("stream start attrs:", ss_node.attrs);
-                    
+
                     sstate.to = ss_node.attrs.to;
                     wsep.emit('stream-add', sstate, ss_node.attrs);
                 } else if (sstate.stream_state === STREAM_OPENED) {
@@ -325,17 +328,17 @@ exports.createServer = function(bosh_server, options, webSocket) {
                     wsep.emit('stream-restart', sstate, ss_node.attrs);
                 }
             }
-            
+
             // console.log("nodes:", nodes);
             assert(nodes instanceof Array);
-            
+
             // Process the nodes normally.
             wsep.emit('nodes', nodes, sstate);
         });
-        
+
         conn.on('close', function() {
             log.trace("%s Stream close requested", stream_name);
-            
+
             if (sn_state.hasOwnProperty(stream_name)) {
                 // Note: Always delete before emitting events
                 delete sn_state[stream_name];
@@ -354,12 +357,12 @@ exports.createServer = function(bosh_server, options, webSocket) {
             }
             wsep.stat_stream_terminate();
         });
-        
+
     });
-    
+
     websocket_server.on('disconnect', function(conn) {
     });
-    
+
     function emit_error(ex) {
         // We enforce similar semantics as the rest of the node.js for
         // the 'error' event and throw an exception if it is unhandled
@@ -367,11 +370,11 @@ exports.createServer = function(bosh_server, options, webSocket) {
             throw new Error(ex.toString());
         }
     }
-    
+
     // Handle the 'error' event on the bosh_server and re-emit it.
     // Throw an exception if no one handles the exception we threw
     bosh_server.on('error', emit_error);
     websocket_server.on('error', emit_error);
-    
+
     return wsep;
 };

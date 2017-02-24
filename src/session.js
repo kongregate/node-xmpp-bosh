@@ -1180,7 +1180,8 @@ function SessionStore(bosh_options, bep) {
 SessionStore.prototype = {
 
     get_active_no: function () {
-        return Object.keys(this._sid_state).length;
+        var count = 0; for (var k in this._sid_state) ++count;
+        return count;
     },
 
     get_total_no: function () {
