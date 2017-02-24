@@ -37,7 +37,7 @@ var filename = path.basename(path.normalize(__filename));
 var log      = require('./log.js').getLogger(filename);
 
 function BoshRequestParser(options) {
-    this._ltx_parser = options && !!options.USE_LTX_PARSER;
+    this._ltx_parser = options && !!options.USE_LTX_PARSER_FOR_BOSH;
     this._parser = this._ltx_parser ? new ltx_p() : new expat.Parser('UTF-8');
     this.init_state_();
 }

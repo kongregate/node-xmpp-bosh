@@ -120,6 +120,11 @@ exports.config = {
 	// speed and error handling
 	use_ltx_parser: false,
 
+  // Enable the use of the faster LTX XML parser for BOSH as well. This will
+	// default to the value of use_ltx_parser, but can be used to disable LTX for
+	// BOSH if it is enabled for websockets
+	use_ltx_parser_for_bosh: false,
+
 	// Connection timeout to remote host
 	connection_timeout: 10000
 };

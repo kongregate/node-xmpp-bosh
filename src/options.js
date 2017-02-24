@@ -111,6 +111,7 @@ function BOSH_Options(opts) {
     this.SYSTEM_INFO_PASSWORD = _opts.system_info_password || '';
 
     this.USE_LTX_PARSER = _opts.use_ltx_parser || false;
+    this.USE_LTX_PARSER_FOR_BOSH = _opts.use_ltx_parser_for_bosh || false;
 
     log.debug("MAX_DATA_HELD: %s",           this.MAX_DATA_HELD);
     log.debug("MAX_BOSH_CONNECTIONS: %s",    this.MAX_BOSH_CONNECTIONS);
@@ -121,6 +122,7 @@ function BOSH_Options(opts) {
     log.debug("MAX_STREAMS_PER_SESSION: %s", this.MAX_STREAMS_PER_SESSION);
     log.debug("PIDGIN_COMPATIBLE: %s",       this.PIDGIN_COMPATIBLE);
     log.debug("USE_LTX_PARSER: %s",          this.USE_LTX_PARSER);
+    log.debug("USE_LTX_PARSER_FOR_BOSH: %s", this.USE_LTX_PARSER_FOR_BOSH);
     log.debug("SYSTEM_INFO_PASSWORD: %s",    (this.SYSTEM_INFO_PASSWORD ? "[SET]" : "[NOT SET]"));
 }
 

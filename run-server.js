@@ -188,6 +188,10 @@ function main() {
 		server_options.use_ltx_parser = false;
 	}
 
+  if(typeof(server_options.use_ltx_parser_for_bosh) === 'undefined') {
+    server_options.use_ltx_parser_for_bosh = server_options.use_ltx_parser;
+  }
+
   // Set the default line trim length.
   if (typeof(server_options.trim_default_length) !== 'undefined') {
       dutil.TRIM_DEFAULT_LENGTH = server_options.trim_default_length;
