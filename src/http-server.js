@@ -42,7 +42,7 @@ function HTTPServer(port, host, stat_func, system_info_func,
                     bosh_request_handler, http_error_handler,
                     bosh_options) {
 
-    var bosh_request_parser = new BoshRequestParser();
+    var bosh_request_parser = new BoshRequestParser(bosh_options);
     var req_list1 = [ ], req_list2 = [ ];
     var origin_regex = bosh_options.ACCESS_CONTROL_ALLOW_ORIGINS;
 
@@ -255,7 +255,7 @@ function HTTPServer(port, host, stat_func, system_info_func,
                 }
             }
 
-            _headers['WWW-Authenticate'] = 
+            _headers['WWW-Authenticate'] =
                 'Basic realm=System Information. Enter username \'admin\'';
             res.writeHead(401, _headers);
             res.end();

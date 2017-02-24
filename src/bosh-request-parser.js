@@ -29,14 +29,16 @@ var ltx      = require('ltx');
 var util     = require('util');
 var dutil    = require('./dutil.js');
 var expat    = require('node-expat');
+var ltx_p    = require('ltx/lib/parsers/ltx');
 var assert   = require('assert').ok;
 var path     = require('path');
 
 var filename = path.basename(path.normalize(__filename));
 var log      = require('./log.js').getLogger(filename);
 
-function BoshRequestParser() {
-    this._parser = new expat.Parser('UTF-8');
+function BoshRequestParser(options) {
+    this._ltx_parser = options && !!options.USE_LTX_PARSER;
+    this._parser = this._ltx_parser ? new ltx_p() : new expat.Parser('UTF-8');
     this.init_state_();
 }
 
@@ -44,7 +46,11 @@ dutil.copy(BoshRequestParser.prototype, {
     /* Initialize the internal state (variables) of the parser */
     init_state_: function() {
         this._parser.removeAllListeners();
-        this._parser.parse("<bosh>");
+        if (this._ltx_parser) {
+            this._parser.write("<bosh>");
+        } else {
+            this._parser.parse("<bosh>");
+        }
 
         this.started_   = false;
         this.parsedBody = null;
@@ -64,7 +70,11 @@ dutil.copy(BoshRequestParser.prototype, {
      */
     reset: function() {
         log.debug("Reseting parser state");
-        this._parser.reset();
+        if (this._ltx_parser) {
+            this._parser = new ltx_p();
+        } else {
+            this._parser.reset();
+        }
         this.init_state_();
     },
 
@@ -125,14 +135,17 @@ dutil.copy(BoshRequestParser.prototype, {
      * the parser.
      */
     parse: function(data) {
+        if(!this._parser) {
+            return false;
+        }
+
         this.parsedBody = null;
-        if (this._parser && !this._parser.parse(data)) {
+        if (this._ltx_parser) {
+            this._parser.write(data);
+        } else if (this._parser && !this._parser.parse(data)) {
             return false;
         }
-        else if (!this._parser) {
-            // end() was called on this parser already.
-            return false;
-        }
+
         return true;
     },
 
@@ -141,7 +154,11 @@ dutil.copy(BoshRequestParser.prototype, {
      */
     end: function() {
         if (this._parser) {
-            this._parser.stop();
+            if (this._ltx_parser) {
+                this._parser.end();
+            } else {
+                this._parser.stop();
+            }
             this._parser.removeAllListeners();
             if (this._stanza) {
                 delete this._stanza;
