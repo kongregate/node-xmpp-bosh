@@ -156,7 +156,8 @@ function StreamStore(bosh_options, bep) {
 StreamStore.prototype = {
 
     get_active_no: function () {
-        return this._sn_info.length;
+        var count = 0; for (var k in this._sn_state) ++count;
+        return count;
     },
 
     get_total_no: function () {
@@ -182,7 +183,7 @@ StreamStore.prototype = {
         var on_stream_terminated_handler = function(stream, condition) {
             /* Function to call when stream is terminated */
             helper.save_terminate_condition_for_wait_time(this._terminated_streams,
-                                                          stream.name, condition, 
+                                                          stream.name, condition,
                                                           stream.session.wait);
             delete this._sn_state[stream.name];
 

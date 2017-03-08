@@ -128,7 +128,7 @@ function Session(node, options, bep, call_on_terminate) {
     // { "stream-name": [ body element attrs obj] }
     this.pending_bosh_responses = { };
 
-    // Once the response is stitched 
+    // Once the response is stitched
     this.pending_stitched_responses = [ ];
 
     // index of the next stream to responsd to
@@ -140,16 +140,16 @@ function Session(node, options, bep, call_on_terminate) {
 
     // A set of responses that have been sent by the BOSH server, but
     // not yet ACKed by the client.
-    // Format: { rid: 
+    // Format: { rid:
     //   {  response: [Response Object with <body> wrapper],
     //      ts: new Date()
-    //   } 
+    //   }
     // }
     //
-    // Invariant: if unacked_responses[k] is truthy, then 
-    // unacked_responses[k], unacked_responses[k+1], ..., 
+    // Invariant: if unacked_responses[k] is truthy, then
+    // unacked_responses[k], unacked_responses[k+1], ...,
     // unacked_responses[max_rid_sent] MUST also be truthy.
-    // 
+    //
     this.unacked_responses = { };
 
     // A set of queued requests that will become complete when "holes"
@@ -547,7 +547,7 @@ Session.prototype = {
         var self = this;
         this.timeout = setTimeout(function _on_session_inactivity_timeout_callback() {
             log.info("%s Terminating Session due to inactivity", self.sid);
-            // Raise a no-client event on pending, unstitched as well as unacked 
+            // Raise a no-client event on pending, unstitched as well as unacked
             // responses.
             var _p = us.pluck(self.pending_stitched_responses, 'response');
 
@@ -593,15 +593,15 @@ Session.prototype = {
         ro.send_termination_stanza(attrs);
     },
 
-    // 
+    //
     // This function immediately sends the message to the client (does
     // not queue them up).
-    // 
+    //
     // ro: The response object to use
-    // 
+    //
     // condition: (optional) A string which specifies the condition to
     // send to the client as to why the session was closed.
-    // 
+    //
     send_terminate_response: function (ro, condition) {
         log.debug("%s send_terminate_response - ro: %s, condition: %s", this.sid, !!ro, condition || "no-condition");
         var attrs = { };
@@ -621,17 +621,17 @@ Session.prototype = {
         }
 
         var attrs = {
-            stream              : stream.name, 
+            stream              : stream.name,
             sid                 : this.sid,
             wait                : this.wait,
-            ver                 : this.ver, 
+            ver                 : this.ver,
             polling             : this.inactivity / 2,
             inactivity          : this.inactivity,
             requests            : this._options.WINDOW_SIZE,
             hold                : this.hold,
             from                : stream.to,
             content             : this.content,
-            "xmpp:restartlogic" : "true", 
+            "xmpp:restartlogic" : "true",
             "xmlns:xmpp"        : 'urn:xmpp:xbosh',
             // secure:     'false', // TODO
             // 'ack' is set by the client. If the client sets 'ack', then we also
@@ -741,19 +741,19 @@ Session.prototype = {
         }
 
         var response = $body(attr);
-        
+
         this.pending_stanzas[stream_name].forEach(function (stanza) {
             response = response.cnode(stanza).tree();
         });
         this.pending_stanzas[stream_name] = [ ];
         return response;
     },
-    
+
     _stitch_new_response: function () {
         var len = this.streams.length;
         this.next_stream = this.next_stream % len;
         log.trace("%s _stitch_new_response - #streams: %s, next_stream: %s", this.sid, len, this.next_stream);
-        
+
         if (!len) {
             return;
         }
@@ -765,9 +765,9 @@ Session.prototype = {
         do {
             var stream = this.streams[this.next_stream];
             this.next_stream = (this.next_stream + 1) % len;
-            
+
             var response = this._stitch_response_for_stream(stream.name);
-            
+
             if (response) {
                 log.trace("%s %s _stitch_response_for_stream - stitched", this.sid, stream.name);
                 this.pending_stitched_responses.push({
@@ -793,7 +793,7 @@ Session.prototype = {
     // the current implementation.
     //
     send_pending_responses: function () {
-        log.trace("%s pending.length: %s, Holding %s response objects", 
+        log.trace("%s pending.length: %s, Holding %s response objects",
                   this.sid, this.pending_stitched_responses.length, this.res.length);
 
         while (true) {
@@ -801,14 +801,14 @@ Session.prototype = {
                 // dont stitch responses as well.
                 break;
             }
-        
+
             if (!this.pending_stitched_responses.length) {
                 this._stitch_new_response();
             }
 
             if (this.pending_stitched_responses.length > 0) {
                 var ro = this.get_response_object();
-                log.trace("%s send_pending_responses - ro: %s, pending_stitched_responses: %s - sending", 
+                log.trace("%s send_pending_responses - ro: %s, pending_stitched_responses: %s - sending",
                           this.sid, us.isTruthy(ro), this.pending_stitched_responses.length);
 
                 var _p       = this.pending_stitched_responses.shift();
@@ -876,13 +876,13 @@ Session.prototype = {
         this.try_sending();
     },
 
-    // 
+    //
     // If the client has enabled ACKs, then acknowledge the highest request
     // that we have received till now -- if it is not the current request.
-    // 
+    //
     // Returns: The RID that we should ACK or "null", in which case,
     // we implicitly ACK the RID on which we are sending the response.
-    // 
+    //
     _get_highest_rid_to_ack: function (rid) {
         if (rid !== this.rid) {
             return this.rid;
@@ -1042,9 +1042,9 @@ Session.prototype = {
             } else {
                 // We inject a response packet into the pending queue to
                 // notify the client that it _may_ have missed something.
-                // TODO: we should also have a check which ensures that 
-                // time > RTT has passed. 
-                log.trace("%s Sending report - max_rid_sent: %s, node.attrs.ack: %s", 
+                // TODO: we should also have a check which ensures that
+                // time > RTT has passed.
+                log.trace("%s Sending report - max_rid_sent: %s, node.attrs.ack: %s",
                           this.sid, this.max_rid_sent, node.attrs.ack);
                 this.enqueue_bosh_response({
                     report: node.attrs.ack + 1,
@@ -1081,14 +1081,14 @@ Session.prototype = {
 
         // Q. can we get rid of this forEach and check
         // only for the node.attrs.rid value??
-        // 
+        //
         // A. No idea - will need to think about it. However, a
         // standard for loop seems more readable here.
-        // 
+        //
         _queued_request_keys.forEach(function _handle_broken_queued_requests(rid) {
             // There should be exactly 1 'rid' in state.queued_requests
             // that is less than state.rid + 1. -- such requests are
-            // immediately returned (processed and deleted by this 
+            // immediately returned (processed and deleted by this
             // function).
 
             if (rid < self.rid + 1) {
@@ -1171,16 +1171,17 @@ function SessionStore(bosh_options, bep) {
 
 }
 
-// Ideally, the session_* functions shouldn't worry about anything except for 
+// Ideally, the session_* functions shouldn't worry about anything except for
 // session state maintenance. They should specifically NOT know about streams.
-// There may be some exceptions where the abstractions leak into one another, 
-// but they should be the exceptions (and there should be a good reason for 
+// There may be some exceptions where the abstractions leak into one another,
+// but they should be the exceptions (and there should be a good reason for
 // such an occurence) and not the rule.
-// 
+//
 SessionStore.prototype = {
 
     get_active_no: function () {
-        return this._sid_info.length;
+        var count = 0; for (var k in this._sid_state) ++count;
+        return count;
     },
 
     get_total_no: function () {
