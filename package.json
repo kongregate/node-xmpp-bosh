@@ -23,7 +23,7 @@
     "tav": "~0.1.0",
     "underscore": "~1.3.3",
     "utf-8-validate": "^1.2.1",
-    "uws": "^0.12.0"
+    "uws": "https://s3-us-west-2.amazonaws.com/kong-depot/uws-0.12.0.tar.gz"
   },
   "devDependencies": {
     "jsdom": "~0.2.15",
