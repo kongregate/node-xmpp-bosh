@@ -28,15 +28,9 @@ var fs    = require('fs');
 var path  = require('path');
 var nxb   = require("./src/main.js");
 var dutil = require('./src/dutil.js');
-var memwatch = require('memwatch-next');
 require('heapdump');
 
 var BOSH_DEFAULT_CONFIG_PATH = '/etc/bosh.js.conf';
-
-memwatch.on('leak', function(info) {
-	console.error("Leak detected", info);
-});
-
 
 function app_meta() {
 	var fs = require('fs');
