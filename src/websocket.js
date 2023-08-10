@@ -65,7 +65,7 @@ exports.createServer = function(bosh_server, options, webSocket) {
       log.debug('Policy file server created on port %s', policyPort);
     });
 
-    webSocket = webSocket || require('../vendor/uWebSockets.js-19.2.0/uws');
+    webSocket = webSocket || require('uws');
 	// Config options
 	var ping_interval = options.websocket_ping_interval;
     var use_stream_tags = !!options.use_stream_tags;
@@ -97,7 +97,7 @@ exports.createServer = function(bosh_server, options, webSocket) {
 
     var wsep = new WebSocketEventPipe(bosh_server);
 
-    var websocket_server = webSocket.App({
+    var websocket_server = new webSocket.Server({
         server:  bosh_server.server,
         perMessageDeflate: options.permessage_deflate,
         handleProtocols: function(protocols, callback) {
@@ -175,9 +175,7 @@ exports.createServer = function(bosh_server, options, webSocket) {
         sstate.terminated = true;
     });
 
-    websocket_server.ws( options.port.toString(), { open : open, close : close} );
-
-    var open = function(conn) {
+    websocket_server.on('connection', function(conn) {
         // Listen for websocket client errors to prevent crashes
         conn.on('error', function(e) {
             log.error('connection error: %s, %s', e.toString(), e.stack);
@@ -360,11 +358,10 @@ exports.createServer = function(bosh_server, options, webSocket) {
             wsep.stat_stream_terminate();
         });
 
- 	conn.on('error', emit_error);
+    });
 
-    };
-
-    var close = function(conn) {};
+    websocket_server.on('disconnect', function(conn) {
+    });
 
     function emit_error(ex) {
         // We enforce similar semantics as the rest of the node.js for
@@ -377,6 +374,7 @@ exports.createServer = function(bosh_server, options, webSocket) {
     // Handle the 'error' event on the bosh_server and re-emit it.
     // Throw an exception if no one handles the exception we threw
     bosh_server.on('error', emit_error);
+    websocket_server.on('error', emit_error);
 
     return wsep;
 };

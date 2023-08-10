@@ -20,9 +20,9 @@
     "policyfile": "0.0.6",
     "semver": "~7.5.4",
     "tav": "~0.1.0",
-    "uWebSockets.js": "uNetworking/uWebSockets.js#v20.31.0",
     "underscore": "~1.13.6",
-    "utf-8-validate": "^6.0.3"
+    "utf-8-validate": "^6.0.3",
+    "uws": "^9.148.0"
   },
   "devDependencies": {
     "jsdom": "~22.1.0",
